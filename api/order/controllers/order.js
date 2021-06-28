@@ -4,18 +4,30 @@ const unparsed = require("koa-body/unparsed.js");
 
 module.exports = {
     async create(ctx) {
+        const body = ctx.request.body
+        const cart = await strapi.query("cart").findOne({ id: body.cart })
+        const productIds = cart.items.map((item) => item.product)
+        const orderedProducts = await strapi.query("product").find({ id_in: productIds })
+        const totalPriceforProducts = cart.items.reduce((total, currentItem) => {
+            const matchingProduct = orderedProducts.find((product) => product.id === currentItem.product)
+            return total + matchingProduct.price * currentItem.count
+        }, 0)
+
+        const shippingMethod = await strapi.query("shipping-method").findOne({ id: body.shippingMethod })
+        const paymentMethod = await strapi.query("payment-method").findOne({ id: body.paymentMethod })
+
+        const totalPrice = totalPriceforProducts + shippingMethod.price + paymentMethod.price
+
+
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: 150000,
+            amount: totalPrice,
             currency: 'czk',
-            // Verify your integration in this guide by including this parameter
-            metadata: { integration_check: 'accept_a_payment' },
         });
-        console.log(paymentIntent)
         if (ctx.is('multipart')) {
             const { data, files } = parseMultipartData(ctx);
             entity = await strapi.services.order.create(data, { files });
         } else {
-            entity = await strapi.services.order.create({ ...ctx.request.body, token: paymentIntent.client_secret });
+            entity = await strapi.services.order.create({ ...body, token: paymentIntent.client_secret, total: totalPrice });
         }
 
         entity = sanitizeEntity(entity, { model: strapi.models.order });
