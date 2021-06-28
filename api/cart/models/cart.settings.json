@@ -1,0 +1,19 @@
+{
+  "kind": "collectionType",
+  "collectionName": "carts",
+  "info": {
+    "name": "cart",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "items": {
+      "collection": "cart-item",
+      "via": "cart"
+    }
+  }
+}
