@@ -12,6 +12,7 @@
   "devDependencies": {},
   "dependencies": {
     "knex": "0.21.18",
+    "pdfmake": "^0.1.71",
     "sqlite3": "5.0.0",
     "strapi": "3.5.3",
     "strapi-admin": "3.5.3",
@@ -23,6 +24,7 @@
     "strapi-plugin-graphql": "^3.5.3",
     "strapi-plugin-upload": "3.5.3",
     "strapi-plugin-users-permissions": "3.5.3",
+    "strapi-provider-upload-do": "^3.5.4",
     "strapi-utils": "3.5.3",
     "stripe": "^8.138.0"
   },

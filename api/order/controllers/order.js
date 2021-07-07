@@ -12,15 +12,13 @@ module.exports = {
             const matchingProduct = orderedProducts.find((product) => product.id === currentItem.product)
             return total + matchingProduct.price * currentItem.count
         }, 0)
-
-        const shippingMethod = await strapi.query("shipping-method").findOne({ id: body.shippingMethod })
-        const paymentMethod = await strapi.query("payment-method").findOne({ id: body.paymentMethod })
-
+        const shippingMethod = await strapi.query("shipping-method").findOne({ id: body.shipping_method })
+        const paymentMethod = await strapi.query("payment-method").findOne({ id: body.payment_method })
         const totalPrice = totalPriceforProducts + shippingMethod.price + paymentMethod.price
 
 
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: totalPrice,
+            amount: totalPrice * 100,
             currency: 'czk',
         });
         if (ctx.is('multipart')) {
@@ -50,7 +48,6 @@ module.exports = {
         }
         // Handle the event
         strapi.log.debug(event.data.object, "eventik")
-        console.log(event.data.object)
         switch (event.type) {
             case 'payment_intent.succeeded':
                 const paymentIntent = event.data.object;
